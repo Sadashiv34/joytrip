@@ -12,43 +12,56 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
 const auth = firebase.auth();
 const database = firebase.database();
 
-// Auth state observer
-firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-        // User is signed in
-        console.log('User is signed in:', user.email);
-        updateAuthUI(user);
-    } else {
-        // User is signed out
-        console.log('User is signed out');
-        updateAuthUI(null);
-    }
-});
-
 // Update UI based on auth state
 function updateAuthUI(user) {
-    const loginLinks = document.querySelectorAll('.login-link');
-    const userMenu = document.getElementById('userMenu');
-    
-    if (!loginLinks.length || !userMenu) return;
-    
-    if (user) {
-        // User is signed in
-        loginLinks.forEach(link => {
-            link.style.display = 'none';
-        });
-        userMenu.style.display = 'block';
-    } else {
-        // User is signed out
-        loginLinks.forEach(link => {
-            link.style.display = 'block';
-        });
-        userMenu.style.display = 'none';
+    try {
+        const loginLinks = document.querySelectorAll('.login-link');
+        const userMenu = document.getElementById('userMenu');
+        
+        if (!loginLinks.length || !userMenu) return;
+        
+        if (user) {
+            // User is signed in
+            loginLinks.forEach(link => {
+                link.style.display = 'none';
+            });
+            userMenu.style.display = 'block';
+            
+            // Update user info if elements exist
+            const userEmail = document.getElementById('user-email');
+            if (userEmail) userEmail.textContent = user.email;
+        } else {
+            // User is signed out
+            loginLinks.forEach(link => {
+                link.style.display = 'block';
+            });
+            userMenu.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error updating auth UI:', error);
     }
+}
+
+// Auth state observer
+if (typeof window !== 'undefined') {
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            // User is signed in
+            console.log('User is signed in:', user.email);
+            updateAuthUI(user);
+        } else {
+            // User is signed out
+            console.log('User is signed out');
+            updateAuthUI(null);
+        }
+    });
 }
 
 // Sign up function

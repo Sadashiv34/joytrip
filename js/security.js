@@ -98,7 +98,4 @@ window.SecurityUtils = {
                 return sanitized;
         }
     }
-}
-
-// Default export for the module
-export default SecurityUtils;
+};

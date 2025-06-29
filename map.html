@@ -404,7 +404,6 @@
         </footer>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -414,23 +413,26 @@
     <script>
         // Your web app's Firebase configuration
         const firebaseConfig = {
-            // Your Firebase config here
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyDwGx2qJ90LFhu06lgWr_r6vv5Jx6JqxzE",
+            authDomain: "pagepilot-y6ez7.firebaseapp.com",
+            projectId: "pagepilot-y6ez7",
+            storageBucket: "pagepilot-y6ez7.firebasestorage.app",
+            messagingSenderId: "654134506434",
+            appId: "1:654134506434:web:303611b2baa4b90e271c5b"
         };
 
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
     </script>
     
-    <!-- Auth Script -->
-    <script src="js/auth.js"></script>
+    <!-- Load Leaflet after Firebase -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- Map Script -->
+    <!-- App Scripts -->
+    <script src="js/security.js"></script>
+    <script src="js/auth.js"></script>
     <script src="app.js"></script>
     
     <!-- User Menu Script -->
