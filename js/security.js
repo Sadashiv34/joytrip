@@ -1,7 +1,7 @@
 // Security utility functions
-export class SecurityUtils {
+window.SecurityUtils = {
     // Sanitize input to prevent XSS
-    static sanitizeInput(input) {
+    sanitizeInput: function(input) {
         if (typeof input !== 'string') return input;
         
         // Remove any potentially dangerous characters
@@ -12,23 +12,23 @@ export class SecurityUtils {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#x27;')
             .replace(/\//g, '&#x2F;');
-    }
+    },
 
     // Validate email format
-    static isValidEmail(email) {
+    isValidEmail: function(email) {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(String(email).toLowerCase());
-    }
+    },
 
     // Validate password strength
-    static isStrongPassword(password) {
+    isStrongPassword: function(password) {
         // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
         const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?=.{8,})/;
         return re.test(password);
-    }
+    },
 
     // Sanitize and validate user input
-    static processUserInput(input, type = 'text') {
+    processUserInput: function(input, type = 'text') {
         const sanitized = this.sanitizeInput(input).trim();
         
         switch(type) {
@@ -80,8 +80,8 @@ export class SecurityUtils {
                     /<style/gi
                 ];
 
-                for (const pattern of suspiciousPatterns) {
-                    if (pattern.test(sanitized)) {
+                for (let i = 0; i < suspiciousPatterns.length; i++) {
+                    if (suspiciousPatterns[i].test(sanitized)) {
                         throw new Error('Invalid input detected');
                     }
                 }
