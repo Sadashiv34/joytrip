@@ -1,4 +1,3 @@
-const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -7,31 +6,59 @@ console.log('Running build script for JoyTrips...');
 // Create public directory if it doesn't exist
 const publicDir = path.join(process.cwd(), 'public');
 if (!fs.existsSync(publicDir)) {
-  fs.mkdirSync(publicDir);
+  fs.mkdirSync(publicDir, { recursive: true });
 }
 
-// Copy all files to public directory (except node_modules, .git, etc.)
-const copyRecursiveSync = (src, dest) => {
-  const exists = fs.existsSync(src);
-  const stats = exists && fs.statSync(src);
-  const isDirectory = exists && stats.isDirectory();
+// List of files and directories to copy
+const filesToCopy = [
+  'index.html',
+  'landing.html',
+  'login.html',
+  'signup.html',
+  'map.html',
+  'css',
+  'js',
+  'images'
+];
 
-  if (isDirectory) {
-    if (!fs.existsSync(dest)) {
-      fs.mkdirSync(dest);
-    }
-    fs.readdirSync(src).forEach(childItemName => {
-      if (childItemName !== 'node_modules' && childItemName !== '.git' && childItemName !== '.vercel') {
-        copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName));
+// Copy files to public directory
+filesToCopy.forEach(item => {
+  const src = path.join(process.cwd(), item);
+  const dest = path.join(publicDir, item);
+  
+  if (fs.existsSync(src)) {
+    if (fs.statSync(src).isDirectory()) {
+      // Copy directory
+      copyDirSync(src, dest);
+    } else {
+      // Copy file
+      const dir = path.dirname(dest);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
       }
-    });
-  } else {
-    fs.copyFileSync(src, dest);
+      fs.copyFileSync(src, dest);
+    }
   }
-};
-
-console.log('Copying files to public directory...');
-copyRecursiveSync(process.cwd(), publicDir);
+});
 
 console.log('Build complete');
-process.exit(0);
+
+// Helper function to copy directories
+function copyDirSync(src, dest) {
+  if (!fs.existsSync(dest)) {
+    fs.mkdirSync(dest, { recursive: true });
+  }
+
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+
+    if (entry.isDirectory()) {
+      copyDirSync(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}

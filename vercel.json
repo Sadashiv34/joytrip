@@ -2,15 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "vercel-build.js",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "public"
-      }
+      "src": "package.json",
+      "use": "@vercel/static-build"
     }
   ],
   "routes": [
-    { "src": "/_next/static/(.*)", "dest": "/static/$1" },
     { "src": "/(.*)", "dest": "/landing.html" }
   ]
 }

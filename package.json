@@ -5,8 +5,9 @@
   "main": "landing.html",
   "scripts": {
     "start": "npx serve -s",
-    "build": "echo 'Build complete'"
+    "build": "bash build.sh"
   },
+  "now-build": "bash build.sh",
   "keywords": [
     "travel",
     "tourism",
