@@ -576,25 +576,51 @@
             </div>
         </div>
     </footer>
+    <!-- Import Maps for browser compatibility -->
+    <script type="importmap">
+    {
+        "imports": {
+            "firebase/app": "https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js",
+            "firebase/auth": "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js",
+            "firebase/database": "https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"
+        }
+    }
+    </script>
+    
     <!-- Main app script -->
     <script type="module">
         // Import necessary modules
-        import { initializeFirebase, auth, setupAuthStateListener, signIn, signUp, signOut, signInWithGoogle } from './js/auth.js';
+        import { initializeFirebase, setupAuthStateListener, signIn, signUp, signOut, signInWithGoogle } from './js/auth.js';
         import { SecurityUtils } from './js/security.js';
         
         // Initialize Firebase and set up auth state listener
         (async () => {
             try {
-                await initializeFirebase();
-                setupAuthStateListener();
-                
-                // Make SecurityUtils available globally if needed
-                window.SecurityUtils = SecurityUtils;
-                
-                // Make auth functions available globally if needed
-                window.auth = { signIn, signUp, signOut, signInWithGoogle };
+                const initialized = await initializeFirebase();
+                if (initialized) {
+                    setupAuthStateListener();
+                    
+                    // Make SecurityUtils available globally
+                    window.SecurityUtils = SecurityUtils;
+                    
+                    // Make auth functions available globally
+                    window.auth = { 
+                        signIn, 
+                        signUp, 
+                        signOut, 
+                        signInWithGoogle 
+                    };
+                    
+                    console.log('Firebase initialized successfully');
+                }
             } catch (error) {
                 console.error('Error initializing application:', error);
+                // Show user-friendly error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = 'Failed to initialize the application. Please refresh the page or try again later.';
+                errorDiv.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #ffebee; color: #c62828; padding: 15px; border-radius: 4px; z-index: 1000;';
+                document.body.appendChild(errorDiv);
             }
         })();
         
