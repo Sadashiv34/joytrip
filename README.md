@@ -1,110 +1,97 @@
-# JoyTrip - Tourist Place Discovery App
+# JoyTrips - Discover Amazing Places
 
-JoyTrip helps users discover amazing tourist places near their current location. The app provides information about nearby attractions, including details like distance, category, and address.
+A web application that helps users discover tourist places near them using geolocation.
 
 ## Features
 
 - Real-time location detection
-- Find tourist places within a specified radius
-- Detailed information about each place
+- Find tourist attractions within a specified radius
+- User authentication (sign up, sign in, password reset)
 - Responsive design for all devices
-- User authentication (signup/login)
-- Feedback system
+- Interactive map with markers
 
-## Prerequisites
+## Technologies Used
 
-Before deploying, make sure you have:
+- HTML5, CSS3, JavaScript (ES6+)
+- [Leaflet.js](https://leafletjs.com/) for interactive maps
+- [Firebase Authentication](https://firebase.google.com/docs/auth) for user management
+- [Geoapify](https://www.geoapify.com/) for place search and geocoding
+- [Vercel](https://vercel.com/) for deployment
 
-1. A Vercel account (https://vercel.com)
-2. Firebase project with Authentication and Firestore enabled
-3. Geoapify API key for location services
+## Deployment
 
-## Deployment Instructions
+### Prerequisites
 
-### 1. Clone the repository
+- Node.js (v14 or later)
+- npm or yarn
+- Vercel CLI (optional)
 
-```bash
-git clone https://github.com/yourusername/joytrip.git
-cd joytrip
-```
+### Deploying to Vercel
 
-### 2. Install dependencies
-
-```bash
-npm install
-```
-
-### 3. Set up environment variables
-
-Create a `.env` file in the root directory and add your configuration:
-
-```bash
-cp .env.example .env
-```
-
-Then edit the `.env` file with your actual API keys and configuration.
-
-### 4. Deploy to Vercel
-
-1. Install Vercel CLI (if not already installed):
+1. Install Vercel CLI (if not installed):
    ```bash
    npm install -g vercel
    ```
 
-2. Login to your Vercel account:
-   ```bash
-   vercel login
-   ```
-
-3. Deploy the application:
+2. Deploy the application:
    ```bash
    vercel
    ```
+   
+   Or connect your GitHub repository to Vercel for continuous deployment.
 
-   Follow the prompts to complete the deployment.
+### Environment Variables
 
-4. For production deployment:
-   ```bash
-   vercel --prod
-   ```
+Create a `.env` file in the root directory with the following variables:
 
-### 5. Configure Environment Variables in Vercel
-
-1. Go to your Vercel project dashboard
-2. Navigate to Settings > Environment Variables
-3. Add all the environment variables from your `.env` file
-
-### 6. Configure Custom Domain (Optional)
-
-1. In your Vercel dashboard, go to the project settings
-2. Navigate to the "Domains" section
-3. Add your custom domain and follow the verification steps
-
-## Environment Variables
-
-- `FIREBASE_API_KEY`: Your Firebase API key
-- `FIREBASE_AUTH_DOMAIN`: Your Firebase auth domain
-- `FIREBASE_PROJECT_ID`: Your Firebase project ID
-- `FIREBASE_STORAGE_BUCKET`: Your Firebase storage bucket
-- `FIREBASE_MESSAGING_SENDER_ID`: Your Firebase messaging sender ID
-- `FIREBASE_APP_ID`: Your Firebase app ID
-- `FIREBASE_MEASUREMENT_ID`: Your Firebase measurement ID (optional)
-- `GEOAPIFY_API_KEY`: Your Geoapify API key
-- `NODE_ENV`: Set to 'production' for production
-- `PORT`: Port to run the server on (default: 3000)
+```
+FIREBASE_API_KEY=your_firebase_api_key
+FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+FIREBASE_PROJECT_ID=your_firebase_project_id
+FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+FIREBASE_APP_ID=your_firebase_app_id
+GEOAPIFY_API_KEY=your_geoapify_api_key
+```
 
 ## Development
 
-To run the application locally:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/joytrips.git
+   cd joytrips
+   ```
 
-```bash
-# Install dependencies
-npm install
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-# Start the development server
-npm run dev
+3. Start the development server:
+   ```bash
+   npm start
+   ```
 
-# The app will be available at http://localhost:3000
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Project Structure
+
+```
+joytrips/
+├── css/                  # CSS styles
+├── js/                   # JavaScript modules
+│   ├── auth.js           # Authentication logic
+│   ├── firebase-config.js # Firebase configuration
+│   └── ...
+├── images/               # Image assets
+├── index.html            # Main HTML file
+├── login.html            # Login page
+├── signup.html           # Signup page
+├── map.html              # Map page
+├── landing.html          # Landing page
+├── package.json          # Project dependencies
+├── vercel.json           # Vercel configuration
+└── README.md             # Project documentation
 ```
 
 ## License

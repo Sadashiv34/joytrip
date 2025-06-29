@@ -276,7 +276,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
     <!-- Auth Script -->
-    <script src="auth.js"></script>
+    <script type="module" src="js/auth.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginForm');
@@ -294,10 +294,6 @@
                 emailInput.value = savedEmail;
                 rememberMe.checked = true;
             }
-            
-            // Get redirect URL from query parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const redirectTo = urlParams.get('redirect') || 'map.html';
             
             // Handle form submission
             loginForm.addEventListener('submit', function(e) {
@@ -348,8 +344,8 @@
                         return signIn(email, password);
                     })
                     .then(() => {
-                        // Redirect to the intended page or default to map.html
-                        window.location.href = redirectTo;
+                        // Redirect to map page on successful login
+                        window.location.href = 'map.html';
                     })
                     .catch((error) => {
                         console.error('Login error:', error);
@@ -421,8 +417,8 @@
                         // The signed-in user info
                         const user = result.user;
                         
-                        // Redirect to the intended page or default to map.html
-                        window.location.href = redirectTo;
+                        // Redirect to map page
+                        window.location.href = 'map.html';
                     })
                     .catch((error) => {
                         // Handle Errors here

@@ -576,53 +576,30 @@
             </div>
         </div>
     </footer>
-    <!-- Import Maps for browser compatibility -->
-    <script type="importmap">
-    {
-        "imports": {
-            "firebase/app": "https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js",
-            "firebase/auth": "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js",
-            "firebase/database": "https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"
-        }
-    }
-    </script>
+    <!-- Add security scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/security.js" type="module"></script>
+    <script src="js/auth.js" type="module"></script>
     
-    <!-- Main app script -->
-    <script type="module">
-        // Import necessary modules
-        import { initializeFirebase, setupAuthStateListener, signIn, signUp, signOut, signInWithGoogle } from './js/auth.js';
-        import { SecurityUtils } from './js/security.js';
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            // Your Firebase config here
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
         
-        // Initialize Firebase and set up auth state listener
-        (async () => {
-            try {
-                const initialized = await initializeFirebase();
-                if (initialized) {
-                    setupAuthStateListener();
-                    
-                    // Make SecurityUtils available globally
-                    window.SecurityUtils = SecurityUtils;
-                    
-                    // Make auth functions available globally
-                    window.auth = { 
-                        signIn, 
-                        signUp, 
-                        signOut, 
-                        signInWithGoogle 
-                    };
-                    
-                    console.log('Firebase initialized successfully');
-                }
-            } catch (error) {
-                console.error('Error initializing application:', error);
-                // Show user-friendly error message
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message';
-                errorDiv.textContent = 'Failed to initialize the application. Please refresh the page or try again later.';
-                errorDiv.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #ffebee; color: #c62828; padding: 15px; border-radius: 4px; z-index: 1000;';
-                document.body.appendChild(errorDiv);
-            }
-        })();
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Import auth manager
+        import { authManager } from './js/auth.js';
         
         // Form validation and submission
         document.addEventListener('DOMContentLoaded', function() {
@@ -742,124 +719,39 @@
                 element.parentNode.insertBefore(errorElement, element.nextSibling);
             }
             
-            // Helper function to check auth state and redirect
-            function checkAuthAndRedirect(destination) {
-                try {
-                    const user = firebase.auth().currentUser;
-                    if (user) {
-                        // User is signed in, redirect to destination
-                        window.location.href = destination;
-                    } else {
-                        // User is not signed in, redirect to login with redirect parameter
-                        window.location.href = `/login.html?redirect=${encodeURIComponent(destination)}`;
-                    }
-                } catch (error) {
-                    console.error('Auth check error:', error);
-                    // If there's an error with auth, still try to navigate
-                    window.location.href = destination;
-                }
-            }
-
             // Smooth scrolling for anchor links
+            // Smooth scroll for anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                if (!anchor.classList.contains('no-smooth-scroll')) {
-                    anchor.addEventListener('click', function(e) {
-                        const href = this.getAttribute('href');
-                        if (href && (href === '#' || href.startsWith('#'))) {
-                            e.preventDefault();
-                            const targetId = href === '#' ? 'hero' : href.substring(1);
-                            const target = document.getElementById(targetId);
-                            
-                            if (target) {
-                                window.scrollTo({
-                                    top: target.offsetTop - 80, // Adjust for fixed header
-                                    behavior: 'smooth'
-                                });
-                                // Update URL without adding to history
-                                window.history.pushState(null, '', `#${targetId}`);
-                            }
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#' || href.startsWith('#')) {
+                        e.preventDefault();
+                        const target = document.querySelector(href);
+                        if (target) {
+                            window.scrollTo({
+                                top: target.offsetTop - 80, // Adjust for fixed header
+                                behavior: 'smooth'
+                            });
                         }
-                    });
-                }
+                    }
+                });
             });
 
-            // Helper function to wait for Firebase
-            async function waitForFirebase() {
-                if (typeof firebase === 'undefined') {
-                    return new Promise((resolve) => {
-                        const checkFirebase = setInterval(() => {
-                            if (typeof firebase !== 'undefined') {
-                                clearInterval(checkFirebase);
-                                resolve(true);
-                            }
-                        }, 100);
-                    });
-                }
-                return Promise.resolve(true);
-            }
-
-            // Helper function to check auth and redirect
-            async function checkAuthAndRedirect(destination) {
-                try {
-                    await waitForFirebase();
-                    const user = firebase.auth().currentUser;
-                    if (user) {
-                        window.location.href = destination;
-                    } else {
-                        window.location.href = `/login.html?redirect=${encodeURIComponent(destination)}`;
-                    }
-                } catch (error) {
-                    console.error('Auth check error:', error);
-                    window.location.href = destination;
-                }
-            }
-
             // Button click handlers
-            document.addEventListener('DOMContentLoaded', async function() {
-                // Wait for Firebase to be ready
-                await waitForFirebase();
+            document.getElementById('get-started-btn')?.addEventListener('click', function(e) {
+                // Already handled by anchor link
+            });
 
-                // Get Started Button
-                const getStartedBtn = document.getElementById('get-started-btn');
-                if (getStartedBtn) {
-                    getStartedBtn.addEventListener('click', async function(e) {
-                        e.preventDefault();
-                        await checkAuthAndRedirect('map.html');
-                    });
-                }
+            document.getElementById('explore-btn')?.addEventListener('click', function(e) {
+                // Navigation to login.html is handled by the href
+            });
 
-                // Explore Button
-                const exploreBtn = document.getElementById('explore-btn');
-                if (exploreBtn) {
-                    exploreBtn.addEventListener('click', async function(e) {
-                        e.preventDefault();
-                        await checkAuthAndRedirect('map.html');
-                    });
-                }
+            document.getElementById('start-journey-btn')?.addEventListener('click', function(e) {
+                // Navigation to signup.html is handled by the href
+            });
 
-                // Start Journey Button
-                const startJourneyBtn = document.getElementById('start-journey-btn');
-                if (startJourneyBtn) {
-                    startJourneyBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        window.location.href = 'signup.html';
-                    });
-                }
-
-                // Learn More Button
-                const learnMoreBtn = document.getElementById('learn-more-btn');
-                if (learnMoreBtn) {
-                    learnMoreBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        // Smooth scroll to features section
-                        const featuresSection = document.getElementById('features');
-                        if (featuresSection) {
-                            featuresSection.scrollIntoView({ behavior: 'smooth' });
-                        } else {
-                            window.location.href = 'about.html';
-                        }
-                    });
-                }
+            document.getElementById('learn-more-btn')?.addEventListener('click', function(e) {
+                // Navigation to about.html is handled by the href
             });
 
             // Add animation on scroll
