@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JoyTrips - Discover Amazing Tourist Spots</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --primary-dark: #E65A2B;
+            --secondary: #4285F4;
+            --text: #2D3748;
+            --text-light: #718096;
+            --light-bg: #F7FAFC;
+            --white: #FFFFFF;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--white);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Add your remaining CSS styles here */
+        /* ... */
+
+        /* Button loading state */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
+        .btn-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        .btn-outline .btn-spinner {
+            border-color: var(--primary);
+            border-top-color: transparent;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Your HTML content here -->
+    <!-- ... -->
+
+    <!-- Main Application Script -->
+    <script>
+        // Helper function to load scripts
+        function loadScript(src, callback) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    console.log(`✅ Successfully loaded: ${src}`);
+                    if (callback) callback();
+                    resolve();
+                };
+                script.onerror = (error) => {
+                    console.error(`❌ Error loading: ${src}`, error);
+                    reject(error);
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        // Initialize the application
+        function initializeApp() {
+            console.log('Initializing application...');
+            
+            // Form validation and submission
+            const forms = document.querySelectorAll('form[data-validate]');
+            forms.forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(form);
+                    const formValues = Object.fromEntries(formData.entries());
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    const originalButtonText = submitButton?.innerHTML;
+                    
+                    try {
+                        // Show loading state
+                        if (submitButton) {
+                            submitButton.disabled = true;
+                            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                        }
+                        
+                        if (form.id === 'signup-form') {
+                            const result = await window.authManager.handleSignUp(
+                                formValues.email,
+                                formValues.password,
+                                formValues.name
+                            );
+                            
+                            if (result.success) {
+                                window.location.href = '/dashboard.html';
+                            } else {
+                                showError(form, result.error);
+                            }
+                        } else if (form.id === 'login-form') {
+                            const result = await window.authManager.handleSignIn(
+                                formValues.email,
+                                formValues.password
+                            );
+                            
+                            if (result.success) {
+                                window.location.href = '/dashboard.html';
+                            } else {
+                                showError(form, result.error);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Form submission error:', error);
+                        showError(form, 'An unexpected error occurred. Please try again.');
+                    } finally {
+                        // Restore button state
+                        if (submitButton) {
+                            submitButton.disabled = false;
+                            submitButton.innerHTML = originalButtonText || 'Submit';
+                        }
+                    }
+                });
+            });
+
+            // Add other initialization code here
+            // ...
+        }
+
+        // Show error message
+        function showError(element, message) {
+            // Remove any existing error messages
+            const existingError = element.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // Create and show new error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.style.color = '#ff4444';
+            errorDiv.style.marginTop = '5px';
+            errorDiv.style.fontSize = '0.9em';
+            errorDiv.textContent = message;
+            
+            // Insert after the element
+            element.parentNode.insertBefore(errorDiv, element.nextSibling);
+            
+            // Scroll to the error
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Load all required scripts in sequence
+        async function loadScripts() {
+            try {
+                console.log('Starting script loading...');
+                
+                // Load Firebase SDKs
+                await loadScript('https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js');
+                await loadScript('https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js');
+                await loadScript('https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js');
+                await loadScript('https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js');
+                
+                // Initialize Firebase
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDwGx2qJ90LFhu06lgWr_r6vv5Jx6JqxzE",
+                    authDomain: "pagepilot-y6ez7.firebaseapp.com",
+                    projectId: "pagepilot-y6ez7",
+                    storageBucket: "pagepilot-y6ez7.firebasestorage.app",
+                    messagingSenderId: "654134506434",
+                    appId: "1:654134506434:web:303611b2baa4b90e271c5b"
+                };
+                
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                    console.log('Firebase initialized successfully');
+                }
+                
+                // Load local scripts
+                await loadScript('js/security.js');
+                console.log('SecurityUtils available:', typeof SecurityUtils !== 'undefined');
+                
+                await loadScript('js/auth.js');
+                console.log('authManager available:', typeof authManager !== 'undefined');
+                
+                console.log('All scripts loaded successfully!');
+                
+                // Initialize the application
+                initializeApp();
+                
+            } catch (error) {
+                console.error('Error loading scripts:', error);
+                // Show error to user
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ff4444;color:white;padding:15px;text-align:center;z-index:10000;';
+                errorDiv.textContent = 'Error loading the application. Please refresh the page or try again later.';
+                document.body.prepend(errorDiv);
+            }
+        }
+
+        // Start loading scripts when the page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadScripts);
+        } else {
+            loadScripts();
+        }
+    </script>
+</body>
+</html>
