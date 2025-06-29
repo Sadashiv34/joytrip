@@ -2,9 +2,10 @@
   "name": "joytrips",
   "version": "1.0.0",
   "description": "Joy Trips - Discover Amazing Places",
-  "main": "index.html",
+  "main": "landing.html",
   "scripts": {
-    "start": "npx serve -s"
+    "start": "npx serve -s",
+    "build": "echo 'Build complete'"
   },
   "keywords": [
     "travel",
@@ -19,5 +20,8 @@
   },
   "engines": {
     "node": ">=14.x"
+  },
+  "devDependencies": {
+    "@vercel/static-build": "^1.0.0"
   }
 }

@@ -1,13 +1,16 @@
 {
   "version": 2,
   "builds": [
-    { "src": "*.html", "use": "@vercel/static" },
-    { "src": "*.js", "use": "@vercel/static" },
-    { "src": "*.css", "use": "@vercel/static" },
-    { "src": "images/*", "use": "@vercel/static" },
-    { "src": "js/*.js", "use": "@vercel/static" }
+    {
+      "src": "vercel-build.js",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "public"
+      }
+    }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/_next/static/(.*)", "dest": "/static/$1" },
+    { "src": "/(.*)", "dest": "/landing.html" }
   ]
 }
