@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#4285f4">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Nearby Tourist Places</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="map-styles.css">
+    <link rel="stylesheet" href="marker-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #FF8C00; /* Orange color */
+            --secondary-color: #34a853;
+            --accent-color: #fbbc05;
+            --error-color: #ea4335;
+            --text-color: #202124;
+            --light-gray: #f8f9fa;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', Arial, sans-serif;
+            color: var(--text-color);
+            background-color: #f0f2f5;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .app-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgb(202, 143, 143);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+
+        .app-header {
+            padding: 16px 20px;
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            position: relative;
+            z-index: 1001;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .map-container {
+            position: relative;
+            flex: 1;
+            min-height: 300px;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .radius-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 15px;
+            border-radius: 25px;
+            box-shadow: var(--box-shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            gap: 10px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+        }
+        
+        .radius-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .radius-value {
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .radius-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 120px;
+            height: 4px;
+            border-radius: 2px;
+            background: #ddd;
+            outline: none;
+            margin: 0 5px;
+        }
+        
+        .radius-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .radius-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.2);
+        }
+        
+        .radius-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .radius-slider::-moz-range-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.2);
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+
+        .loading {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 24px;
+            border-radius: 25px;
+            box-shadow: var(--box-shadow);
+            z-index: 1000;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(5px);
+            max-width: 90%;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .loading::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--primary-color);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        .map-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 10;
+            border: 12px solid #fff;
+            border-radius: var(--border-radius);
+            box-shadow: inset 0 0 0 12px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+
+        /* Mobile optimizations */
+        .feedback-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            margin-left: 5px;
+        }
+        
+        .feedback-btn:hover {
+            background: #e67e00;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feedback-btn i {
+            font-size: 0.9rem;
+        }
+        
+        /* Mini Footer Header Styles */
+        .mini-footer {
+            position: relative;
+            background: var(--primary-color);
+            padding: 8px 20px;
+            z-index: 1000;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+        }
+        
+        .mini-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+        
+        .mini-header h2 {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .mini-header .feedback-btn {
+            margin: 0;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .mini-header .feedback-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+            
+            .app-header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .loading {
+                font-size: 0.85rem;
+                padding: 10px 16px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 85%;
+            }
+            
+            .map-frame {
+                border-width: 8px;
+                box-shadow: inset 0 0 0 8px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+
+        @media (max-width: 480px) {
+            .app-header h1 {
+                font-size: 1.1rem;
+            }
+            
+            .loading {
+                font-size: 0.8rem;
+                padding: 8px 14px;
+            }
+            
+            .map-frame {
+                border-width: 6px;
+                box-shadow: inset 0 0 0 6px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+
+        /* Prevent text selection on tap-hold */
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Improve tap targets for mobile */
+        .leaflet-bar a {
+            width: 36px !important;
+            height: 36px !important;
+            line-height: 36px !important;
+            font-size: 20px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>Nearby Tourist Attractions</h1>
+            <div class="header-controls">
+                <div class="radius-selector">
+                    <label for="radius">Search Radius:</label>
+                    <div class="custom-select">
+                        <select id="radius">
+                            <option value="10">10 km</option>
+                            <option value="25" selected>25 km</option>
+                            <option value="50">50 km</option>
+                            <option value="100">100 km</option>
+                        </select>
+                        <div class="select-arrow">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-menu">
+                    <button id="userBtn" class="user-btn">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName">Guest</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div id="userDropdown" class="dropdown-content">
+                        <div class="user-info">
+                            <p id="userEmail">Not signed in</p>
+                        </div>
+                        <a href="#" id="logoutLink">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="map-frame"></div>
+            <div id="loading" class="loading">Loading your location...</div>
+            <div class="radius-controls" id="radiusControls" style="display: none;">
+                <span class="radius-label">Search Radius:</span>
+                <input type="range" min="1" max="50" value="30" class="radius-slider" id="radiusSlider">
+                <span class="radius-value" id="radiusValue">30 km</span>
+            </div>
+        </div>
+        <!-- Mini Footer Header -->
+        <footer class="mini-footer">
+            <div class="mini-header">
+                <h2>JoyTrips</h2>
+                <a href="feedback.html" class="feedback-btn">
+                    <i class="fas fa-comment-alt"></i> Share Feedback
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Auth Script -->
+    <script src="auth.js"></script>
+    
+    <!-- Map Script -->
+    <script src="app.js" defer></script>
+    
+    <!-- User Menu Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userBtn = document.getElementById('userBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            const logoutLink = document.getElementById('logoutLink');
+            const userName = document.getElementById('userName');
+            const userEmail = document.getElementById('userEmail');
+            
+            // Toggle dropdown
+            userBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+                userBtn.classList.toggle('active');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!userBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                    userDropdown.style.display = 'none';
+                    userBtn.classList.remove('active');
+                }
+            });
+            
+            // Handle logout
+            logoutLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                signOut();
+            });
+            
+            // Check auth state
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    // User is signed in
+                    const displayName = user.displayName || 'User';
+                    const email = user.email || 'No email';
+                    
+                    // Update UI
+                    userName.textContent = displayName;
+                    userEmail.textContent = email;
+                    
+                    // Show user's first name if available
+                    if (displayName) {
+                        const firstName = displayName.split(' ')[0];
+                        userName.textContent = firstName;
+                    }
+                } else {
+                    // User is signed out, redirect to login
+                    window.location.href = 'login.html';
+                }
+            });
+            
+            // Prevent dropdown from closing when clicking inside it
+            userDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    </script>
+</body>
+</html>

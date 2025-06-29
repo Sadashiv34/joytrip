@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - JoyTrips</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4285f4;
+            --primary-dark: #3367d6;
+            --accent: #fbbc05;
+            --error: #ea4335;
+            --success: #34a853;
+            --text: #202124;
+            --text-light: #5f6368;
+            --light-gray: #f8f9fa;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--light-gray);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            color: var(--primary);
+        }
+
+        .logo i {
+            color: var(--accent);
+            margin-right: 0.5rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+        }
+
+        .btn-google {
+            background: white;
+            color: var(--text);
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-google:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #eee;
+            margin: 0 1rem;
+        }
+
+        .links {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .links a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            text-align: left;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .password-requirements {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
+            text-align: left;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .requirement i {
+            margin-right: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .requirement.valid {
+            color: var(--success);
+        }
+
+        .requirement.valid i {
+            color: var(--success);
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 2rem 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo-container">
+            <a href="index.html" class="logo">
+                <img src="https://i.ibb.co/chbb9vFH/joytrip-logo-removebg-preview.png" alt="JoyTrip Logo" style="max-height: 60px; width: auto;">
+                <div class="logo-text">JoyTrip</div>
+            </a>
+        </div>
+        
+        <h1>Create an Account</h1>
+        
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="Enter your full name" required>
+                <div class="error-message" id="nameError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+                <div class="error-message" id="emailError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Create a password" required>
+                <div class="password-requirements">
+                    <p>Your password must contain:</p>
+                    <div class="requirement" id="lengthReq">
+                        <i class="far fa-circle"></i>
+                        <span>At least 8 characters</span>
+                    </div>
+                    <div class="requirement" id="numberReq">
+                        <i class="far fa-circle"></i>
+                        <span>At least 1 number</span>
+                    </div>
+                    <div class="requirement" id="letterReq">
+                        <i class="far fa-circle"></i>
+                        <span>At least 1 letter</span>
+                    </div>
+                </div>
+                <div class="error-message" id="passwordError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                <div class="error-message" id="confirmPasswordError"></div>
+            </div>
+            
+            <button type="submit" class="btn">Create Account</button>
+            <div class="success-message" id="successMessage">
+                Account created successfully! Redirecting...
+            </div>
+            
+            <div class="divider">or</div>
+            
+            <button type="button" class="btn btn-google" id="googleSignUp">
+                <i class="fab fa-google"></i>
+                Sign up with Google
+            </button>
+            
+            <div class="links">
+                <p>Already have an account? <a href="login.html">Sign in</a></p>
+            </div>
+        </form>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Auth Script -->
+    <script src="auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const signupForm = document.getElementById('signupForm');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const nameError = document.getElementById('nameError');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+            const successMessage = document.getElementById('successMessage');
+            const googleSignUpBtn = document.getElementById('googleSignUp');
+
+            // Password requirement elements
+            const lengthReq = document.getElementById('lengthReq');
+            const numberReq = document.getElementById('numberReq');
+            const letterReq = document.getElementById('letterReq');
+
+            // Password validation
+            function validatePassword(password) {
+                // Check length
+                const isLengthValid = password.length >= 8;
+                lengthReq.classList.toggle('valid', isLengthValid);
+                lengthReq.querySelector('i').className = isLengthValid ? 'fas fa-check-circle' : 'far fa-circle';
+                
+                // Check for number
+                const hasNumber = /[0-9]/.test(password);
+                numberReq.classList.toggle('valid', hasNumber);
+                numberReq.querySelector('i').className = hasNumber ? 'fas fa-check-circle' : 'far fa-circle';
+                
+                // Check for letter
+                const hasLetter = /[a-zA-Z]/.test(password);
+                letterReq.classList.toggle('valid', hasLetter);
+                letterReq.querySelector('i').className = hasLetter ? 'fas fa-check-circle' : 'far fa-circle';
+                
+                return isLengthValid && hasNumber && hasLetter;
+            }
+
+
+            // Handle form submission
+            signupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Reset error messages
+                nameError.style.display = 'none';
+                emailError.style.display = 'none';
+                passwordError.style.display = 'none';
+                confirmPasswordError.style.display = 'none';
+                successMessage.style.display = 'none';
+                
+                const name = nameInput.value.trim();
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                // Validation flags
+                let isValid = true;
+                
+                // Name validation
+                if (!name) {
+                    nameError.textContent = 'Name is required';
+                    nameError.style.display = 'block';
+                    isValid = false;
+                } else if (name.length < 2) {
+                    nameError.textContent = 'Name must be at least 2 characters';
+                    nameError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Email validation
+                if (!email) {
+                    emailError.textContent = 'Email is required';
+                    emailError.style.display = 'block';
+                    isValid = false;
+                } else if (!/\S+@\S+\.\S+/.test(email)) {
+                    emailError.textContent = 'Please enter a valid email';
+                    emailError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Password validation
+                const isPasswordValid = validatePassword(password);
+                if (!password) {
+                    passwordError.textContent = 'Password is required';
+                    passwordError.style.display = 'block';
+                    isValid = false;
+                } else if (!isPasswordValid) {
+                    passwordError.textContent = 'Please meet all password requirements';
+                    passwordError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Confirm password validation
+                if (password !== confirmPassword) {
+                    confirmPasswordError.textContent = 'Passwords do not match';
+                    confirmPasswordError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (isValid) {
+                    // Create user with email and password
+                    signUp(email, password, name)
+                        .then(() => {
+                            // Show success message
+                            successMessage.style.display = 'block';
+                            signupForm.reset();
+                            
+                            // Redirect to map page after a short delay
+                            setTimeout(() => {
+                                window.location.href = 'map.html';
+                            }, 1500);
+                        })
+                        .catch((error) => {
+                            // Handle errors
+                            console.error('Signup error:', error);
+                            
+                            switch (error.code) {
+                                case 'auth/email-already-in-use':
+                                    emailError.textContent = 'An account with this email already exists';
+                                    emailError.style.display = 'block';
+                                    break;
+                                case 'auth/invalid-email':
+                                    emailError.textContent = 'Please enter a valid email';
+                                    emailError.style.display = 'block';
+                                    break;
+                                case 'auth/weak-password':
+                                    passwordError.textContent = 'Password should be at least 6 characters';
+                                    passwordError.style.display = 'block';
+                                    break;
+                                default:
+                                    alert('An error occurred. Please try again.');
+                            }
+                        });
+                }
+            });
+
+            // Real-time password validation
+            passwordInput.addEventListener('input', function() {
+                validatePassword(this.value);
+            });
+
+            // Google Sign Up
+            googleSignUpBtn.addEventListener('click', function() {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                
+                firebase.auth().signInWithPopup(provider)
+                    .then((result) => {
+                        // This gives you a Google Access Token
+                        const credential = firebase.auth.GoogleAuthProvider.credentialFromResult(result);
+                        const token = credential.accessToken;
+                        
+                        // The signed-in user info
+                        const user = result.user;
+                        
+                        // Redirect to map page
+                        window.location.href = 'map.html';
+                    })
+                    .catch((error) => {
+                        // Handle Errors here
+                        const errorCode = error.code;
+                        const errorMessage = error.message;
+                        const email = error.email;
+                        const credential = firebase.auth.GoogleAuthProvider.credentialFromError(error);
+                        
+                        console.error('Google sign up error:', error);
+                        alert('Error signing up with Google. Please try again.');
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

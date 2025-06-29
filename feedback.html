@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - JoyTrips</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --primary-dark: #E65A2B;
+            --text: #2D3748;
+            --text-light: #718096;
+            --light-bg: #F7FAFC;
+            --white: #FFFFFF;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feedback-container {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .back-button i {
+            margin-right: 8px;
+        }
+
+        h1 {
+            color: var(--text);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #E2E8F0;
+            border-radius: var(--border-radius);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+        }
+
+        .rating {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .rating input {
+            display: none;
+        }
+
+        .rating label {
+            cursor: pointer;
+            font-size: 24px;
+            color: #E2E8F0;
+            transition: color 0.2s;
+        }
+
+        .rating input:checked ~ label,
+        .rating label:hover,
+        .rating label:hover ~ label {
+            color: #FFD700;
+        }
+
+        .rating input:checked ~ label {
+            color: #FFD700;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .feedback-container {
+                padding: 30px 20px;
+                margin: 20px 0;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="feedback-container">
+            <a href="map.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back to Map
+            </a>
+            
+            <h1>We'd Love Your Feedback</h1>
+            <p class="subtitle">Your thoughts help us improve JoyTrips</p>
+            
+            <form id="feedback-form">
+                <div class="form-group">
+                    <label for="name">Your Name (Optional)</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email (Optional)</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email if you'd like a response">
+                </div>
+                
+                <div class="form-group">
+                    <label>How would you rate your experience?</label>
+                    <div class="rating">
+                        <input type="radio" id="star5" name="rating" value="5">
+                        <label for="star5">★</label>
+                        <input type="radio" id="star4" name="rating" value="4">
+                        <label for="star4">★</label>
+                        <input type="radio" id="star3" name="rating" value="3">
+                        <label for="star3">★</label>
+                        <input type="radio" id="star2" name="rating" value="2">
+                        <label for="star2">★</label>
+                        <input type="radio" id="star1" name="rating" value="1" required>
+                        <label for="star1">★</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="feedback-type">Type of Feedback</label>
+                    <select id="feedback-type" name="feedback-type" required>
+                        <option value="">Select feedback type</option>
+                        <option value="suggestion">Suggestion</option>
+                        <option value="bug">Bug Report</option>
+                        <option value="feature">Feature Request</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Your Feedback</label>
+                    <textarea id="message" name="message" placeholder="Share your thoughts with us..." required></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-block">Submit Feedback</button>
+            </form>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 JoyTrips. All rights reserved.</p>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Include Security Utils -->
+    <script src="js/security.js"></script>
+    
+    <script>
+        // Initialize Firebase with your config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwGx2qJ90LFhu06lgWr_r6vv5Jx6JqxzE",
+            authDomain: "pagepilot-y6ez7.firebaseapp.com",
+            databaseURL: "https://pagepilot-y6ez7-default-rtdb.firebaseio.com",
+            projectId: "pagepilot-y6ez7",
+            storageBucket: "pagepilot-y6ez7.firebasestorage.app",
+            messagingSenderId: "654134506434",
+            appId: "1:654134506434:web:303611b2baa4b90e271c5b"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        const db = firebase.firestore();
+        const security = new SecurityUtils();
+        
+        // Function to show error message
+        function showError(input, message) {
+            const formGroup = input.closest('.form-group');
+            let errorElement = formGroup.querySelector('.error-message');
+            
+            if (!errorElement) {
+                errorElement = document.createElement('div');
+                errorElement.className = 'error-message';
+                formGroup.appendChild(errorElement);
+            }
+            
+            errorElement.textContent = message;
+            input.classList.add('error');
+        }
+        
+        // Function to clear error
+        function clearError(input) {
+            const formGroup = input.closest('.form-group');
+            const errorElement = formGroup.querySelector('.error-message');
+            
+            if (errorElement) {
+                errorElement.remove();
+            }
+            
+            input.classList.remove('error');
+        }
+        
+        // Initialize form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('feedback-form');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            let originalBtnText = submitBtn.innerHTML;
+            
+            // Input validation on blur
+            form.querySelectorAll('input, textarea, select').forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        if (this.required) {
+                            showError(this, 'This field is required');
+                        }
+                        return;
+                    }
+                    
+                    try {
+                        let sanitized;
+                        
+                        if (this.name === 'email') {
+                            sanitized = security.sanitizeInput(this.value.trim(), 'feedback-email');
+                        } else if (this.name === 'message') {
+                            sanitized = security.sanitizeInput(this.value.trim(), 'feedback-message');
+                        } else {
+                            sanitized = security.sanitizeInput(this.value.trim(), this.name);
+                        }
+                        
+                        this.value = sanitized;
+                        clearError(this);
+                    } catch (error) {
+                        showError(this, error.message);
+                    }
+                });
+                
+                // Clear error on focus
+                input.addEventListener('focus', function() {
+                    clearError(this);
+                });
+            });
+            
+            // Form submission
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Reset all errors
+                form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+                form.querySelectorAll('.error-message').forEach(el => el.remove());
+                
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                
+                try {
+                    const formData = new FormData(form);
+                    const feedback = {};
+                    let hasErrors = false;
+                    
+                    // Validate and sanitize all fields
+                    for (let [key, value] of formData.entries()) {
+                        try {
+                            let sanitizedValue = value.trim();
+                            
+                            if (key === 'email' && sanitizedValue) {
+                                feedback[key] = security.sanitizeInput(sanitizedValue, 'feedback-email');
+                            } else if (key === 'message') {
+                                feedback[key] = security.sanitizeInput(sanitizedValue, 'feedback-message');
+                            } else {
+                                feedback[key] = security.sanitizeInput(sanitizedValue, key);
+                            }
+                            
+                            // Clear any existing errors
+                            const input = form.querySelector(`[name="${key}"]`);
+                            if (input) clearError(input);
+                            
+                        } catch (error) {
+                            hasErrors = true;
+                            const input = form.querySelector(`[name="${key}"]`);
+                            if (input) showError(input, error.message);
+                        }
+                    }
+                    
+                    if (hasErrors) {
+                        throw new Error('Please fix the validation errors');
+                    }
+                    
+                    // Add timestamp and user info
+                    feedback.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+                    
+                    const user = firebase.auth().currentUser;
+                    if (user) {
+                        feedback.userId = user.uid;
+                        feedback.userEmail = user.email || feedback.email || 'No email provided';
+                        feedback.userName = user.displayName || feedback.name || 'Anonymous';
+                    } else {
+                        feedback.userId = 'anonymous';
+                        feedback.userEmail = feedback.email || 'No email provided';
+                        feedback.userName = feedback.name || 'Anonymous';
+                    }
+                    
+                    // Submit to Firestore
+                    await db.collection('feedback').add(feedback);
+                    
+                    // Show success message
+                    alert('Thank you for your feedback! We appreciate your input.');
+                    
+                    // Reset form
+                    form.reset();
+                    
+                    // Redirect after delay
+                    setTimeout(() => {
+                        window.location.href = 'map.html';
+                    }, 1500);
+                    
+                } catch (error) {
+                    console.error('Error submitting feedback:', error);
+                    if (error.message !== 'Please fix the validation errors') {
+                        alert('There was an error submitting your feedback. Please try again.');
+                    }
+                } finally {
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            });
+            
+            // Pre-fill user info if logged in
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    const nameField = document.getElementById('name');
+                    const emailField = document.getElementById('email');
+                    
+                    if (user.displayName && nameField && !nameField.value) {
+                        nameField.value = user.displayName;
+                    }
+                    
+                    if (user.email && emailField && !emailField.value) {
+                        emailField.value = user.email;
+                    }
+                }
+            });
+        });
+    </script>
+    
+    <style>
+        /* Error styling */
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .error {
+            border-color: #ff4444 !important;
+            background-color: #fff8f8 !important;
+        }
+        
+        .error-message {
+            color: #ff4444;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+        
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        /* Make sure inputs have enough space for error messages */
+        input[type="text"],
+        input[type="email"],
+        textarea,
+        select {
+            margin-bottom: 0.25rem;
+        }
+    </style>
+</body>
+</html>

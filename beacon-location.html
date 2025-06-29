@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourist Finder with BLE Beacons</title>
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        #map {
+            height: 500px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .beacon-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        button:hover {
+            background: #3367d6;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success { background: #e6f4ea; color: #137333; }
+        .error { background: #fce8e6; color: #c5221f; }
+        .info { background: #e8f0fe; color: #1967d2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel">
+            <h1>Tourist Finder</h1>
+            <p>Find attractions near you using BLE beacons</p>
+            
+            <button id="scanBtn">Scan for BLE Beacons</button>
+            <div id="status" class="status">Ready to scan for beacons...</div>
+            
+            <div id="beaconInfo" class="beacon-info" style="display: none;">
+                <h3>Beacon Information</h3>
+                <div id="beaconData"></div>
+            </div>
+            
+            <div id="locationInfo" class="beacon-info" style="margin-top: 20px;">
+                <h3>Your Location</h3>
+                <div id="locationData">Not detected yet</div>
+            </div>
+            
+            <div id="placesPanel" style="display: none; margin-top: 20px;">
+                <h3>Nearby Attractions</h3>
+                <div id="placesList"></div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div id="map"></div>
+            <div id="mapStatus" class="status info">Map will show your location after scanning</div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Configuration
+        const CONFIG = {
+            // Known beacons (UUID, position, name, txPower)
+            KNOWN_BEACONS: {
+                'b9407f30-f5f8-466e-aff9-25556b57fe6d': {
+                    position: { lat: 12.9716, lng: 77.5946 }, // Example: Bangalore
+                    name: 'City Center Beacon',
+                    txPower: -59 // Typical value, should be calibrated
+                },
+                'b9407f31-f5f8-466e-aff9-25556b57fe6d': {
+                    position: { lat: 12.9721, lng: 77.5933 },
+                    name: 'Mall Beacon',
+                    txPower: -59
+                }
+            },
+            MAX_BEACON_DISTANCE: 100, // meters
+            PLACES_API_URL: 'https://api.opentripmap.com/0.1/en/places/radius',
+            PLACES_API_KEY: 'YOUR_OPENTRIPMAP_API_KEY' // Replace with your API key
+        };
+
+        // Global variables
+        let map;
+        let userMarker;
+        let beacons = [];
+        let currentPosition = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            document.getElementById('scanBtn').addEventListener('click', startScanning);
+        });
+
+        // Initialize Leaflet map
+        function initMap() {
+            map = L.map('map').setView([0, 0], 2);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        // Start BLE scanning
+        async function startScanning() {
+            if (!navigator.bluetooth) {
+                updateStatus('Web Bluetooth is not supported in this browser. Falling back to geolocation...', 'error');
+                fallbackToGeolocation();
+                return;
+            }
+
+            updateStatus('Requesting Bluetooth device...', 'info');
+            
+            try {
+                // Request BLE device with service UUID filter
+                const device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['generic_access', 'generic_attribute'],
+                    optionalAdvertisements: ['rssi']
+                });
+
+                updateStatus(`Connected to: ${device.name || 'Unnamed Device'}`, 'success');
+                
+                // Listen for advertisement events
+                device.addEventListener('advertisementreceived', (event) => {
+                    processBeacon(event);
+                });
+
+                // Connect to the device
+                const server = await device.gatt.connect();
+                updateStatus('Connected to device. Scanning for beacons...', 'info');
+                
+                // Start notifications
+                const service = await server.getPrimaryService('generic_access');
+                const characteristic = await service.getCharacteristic('gap.device_name');
+                await characteristic.startNotifications();
+                
+                // Update UI
+                document.getElementById('beaconInfo').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Bluetooth error:', error);
+                updateStatus(`Bluetooth error: ${error.message}. Falling back to geolocation...`, 'error');
+                fallbackToGeolocation();
+            }
+        }
+
+        // Process beacon data
+        function processBeacon(event) {
+            const beacon = {
+                uuid: event.device.id,
+                rssi: event.rssi,
+                timestamp: new Date(),
+                ...(CONFIG.KNOWN_BEACONS[event.device.id] || {
+                    name: 'Unknown Beacon',
+                    position: null,
+                    txPower: -59
+                })
+            };
+
+            // Calculate distance using RSSI (simplified)
+            if (beacon.rssi && beacon.txPower) {
+                beacon.distance = calculateDistance(beacon.rssi, beacon.txPower);
+            }
+
+            // Update or add beacon
+            const existingIndex = beacons.findIndex(b => b.uuid === beacon.uuid);
+            if (existingIndex >= 0) {
+                beacons[existingIndex] = beacon;
+            } else {
+                beacons.push(beacon);
+            }
+
+            // Update UI
+            updateBeaconDisplay();
+            
+            // If we have position data, update the map
+            if (beacon.position) {
+                updatePosition(beacon.position, `Beacon: ${beacon.name}`);
+                findNearbyPlaces(beacon.position);
+            } else if (beacons.length >= 2) {
+                // If we have multiple beacons, try to triangulate
+                const position = triangulatePosition(beacons);
+                if (position) {
+                    updatePosition(position, 'Triangulated Position');
+                    findNearbyPlaces(position);
+                }
+            }
+        }
+
+        // Calculate distance from RSSI
+        function calculateDistance(rssi, txPower) {
+            if (rssi === 0) return -1.0;
+            
+            const ratio = rssi * 1.0 / txPower;
+            if (ratio < 1.0) {
+                return Math.pow(ratio, 10);
+            } else {
+                const distance = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
+                return distance;
+            }
+        }
+
+        // Triangulate position from multiple beacons
+        function triangulatePosition(beacons) {
+            const validBeacons = beacons.filter(b => b.position && b.distance);
+            
+            if (validBeacons.length < 2) return null;
+            
+            // Simple centroid calculation (for demo purposes)
+            // In a real app, you'd use more sophisticated trilateration
+            let latSum = 0;
+            let lngSum = 0;
+            let count = 0;
+            
+            validBeacons.forEach(beacon => {
+                latSum += beacon.position.lat;
+                lngSum += beacon.position.lng;
+                count++;
+            });
+            
+            return {
+                lat: latSum / count,
+                lng: lngSum / count,
+                accuracy: 100 // meters (approximate)
+            };
+        }
+
+        // Fall back to geolocation API
+        async function fallbackToGeolocation() {
+            updateStatus('Falling back to geolocation API...', 'info');
+            
+            if (!navigator.geolocation) {
+                updateStatus('Geolocation is not supported by your browser', 'error');
+                return;
+            }
+            
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    });
+                });
+                
+                const pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                    accuracy: position.coords.accuracy
+                };
+                
+                updatePosition(pos, 'Geolocation');
+                findNearbyPlaces(pos);
+                
+            } catch (error) {
+                updateStatus(`Geolocation error: ${error.message}`, 'error');
+            }
+        }
+
+        // Update position on map
+        function updatePosition(position, source) {
+            currentPosition = position;
+            
+            // Update map
+            if (!userMarker) {
+                userMarker = L.marker([position.lat, position.lng]).addTo(map);
+                userMarker.bindPopup(`<b>Your Location</b><br>Source: ${source}`).openPopup();
+            } else {
+                userMarker.setLatLng([position.lat, position.lng])
+                    .getPopup()
+                    .setContent(`<b>Your Location</b><br>Source: ${source}`);
+            }
+            
+            map.setView([position.lat, position.lng], 15);
+            
+            // Update location display
+            document.getElementById('locationData').innerHTML = `
+                <strong>Latitude:</strong> ${position.lat.toFixed(6)}<br>
+                <strong>Longitude:</strong> ${position.lng.toFixed(6)}<br>
+                <strong>Accuracy:</strong> ${position.accuracy ? position.accuracy.toFixed(2) + 'm' : 'N/A'}<br>
+                <strong>Source:</strong> ${source}
+            `;
+            
+            updateStatus(`Position updated via ${source}`, 'success');
+        }
+
+        // Find nearby tourist places
+        async function findNearbyPlaces(position) {
+            if (!position) return;
+            
+            updateStatus('Finding nearby attractions...', 'info');
+            
+            try {
+                // In a real app, you would call your places API here
+                // For demo purposes, we'll use mock data
+                const mockPlaces = [
+                    {
+                        name: 'City Museum',
+                        lat: position.lat + 0.001,
+                        lng: position.lng + 0.001,
+                        type: 'museum',
+                        distance: 150
+                    },
+                    {
+                        name: 'Central Park',
+                        lat: position.lat - 0.002,
+                        lng: position.lng + 0.002,
+                        type: 'park',
+                        distance: 300
+                    },
+                    {
+                        name: 'Historic Landmark',
+                        lat: position.lat + 0.002,
+                        lng: position.lng - 0.001,
+                        type: 'landmark',
+                        distance: 250
+                    }
+                ];
+                
+                // Clear existing markers
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker && layer !== userMarker) {
+                        map.removeLayer(layer);
+                    }
+                });
+                
+                // Add place markers
+                mockPlaces.forEach(place => {
+                    const marker = L.marker([place.lat, place.lng]).addTo(map);
+                    marker.bindPopup(`
+                        <b>${place.name}</b><br>
+                        Type: ${place.type}<br>
+                        Distance: ${place.distance}m
+                    `);
+                });
+                
+                // Update places list
+                const placesList = document.getElementById('placesList');
+                placesList.innerHTML = mockPlaces.map(place => `
+                    <div style="margin: 10px 0; padding: 10px; border-bottom: 1px solid #eee;">
+                        <strong>${place.name}</strong><br>
+                        ${place.distance}m away
+                    </div>
+                `).join('');
+                
+                document.getElementById('placesPanel').style.display = 'block';
+                updateStatus(`Found ${mockPlaces.length} nearby attractions`, 'success');
+                
+            } catch (error) {
+                console.error('Error finding places:', error);
+                updateStatus(`Error finding places: ${error.message}`, 'error');
+            }
+        }
+
+        // Update beacon display
+        function updateBeaconDisplay() {
+            const beaconData = document.getElementById('beaconData');
+            beaconData.innerHTML = beacons.map(beacon => `
+                <div style="margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 4px;">
+                    <strong>${beacon.name}</strong><br>
+                    UUID: ${beacon.uuid}<br>
+                    RSSI: ${beacon.rssi} dBm<br>
+                    ${beacon.distance ? `Distance: ${beacon.distance.toFixed(2)}m` : 'Distance: Unknown'}
+                </div>
+            `).join('');
+        }
+
+        // Update status message
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+    </script>
+</body>
+</html>

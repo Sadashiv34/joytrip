@@ -1,0 +1,29 @@
+{
+  "name": "joytrip",
+  "version": "1.0.0",
+  "description": "JoyTrip - Your instant tourist place discovery assistant",
+  "main": "app.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "node vercel-build.js",
+    "vercel-build": "node vercel-build.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "serve-static": "^1.15.0",
+    "compression": "^1.7.4"
+  },
+  "devDependencies": {
+    "@vercel/node": "^2.15.6",
+    "@vercel/static": "^1.3.1"
+  },
+  "engines": {
+    "node": ">=14.x"
+  },
+  "keywords": ["tourism", "travel", "discovery"],
+  "author": "",
+  "license": "ISC"
+}
