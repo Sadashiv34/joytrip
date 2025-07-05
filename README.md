@@ -26,6 +26,14 @@ A web application that helps users discover tourist places near them using geolo
 - npm or yarn
 - Vercel CLI (optional)
 
+### Deploying to GitHub Pages
+
+1. Push your code to a GitHub repository
+2. Go to your repository settings
+3. Navigate to "Pages" section
+4. Select "GitHub Actions" as the source
+5. The deployment will happen automatically via the included workflow
+
 ### Deploying to Vercel
 
 1. Install Vercel CLI (if not installed):
@@ -37,7 +45,7 @@ A web application that helps users discover tourist places near them using geolo
    ```bash
    vercel
    ```
-   
+
    Or connect your GitHub repository to Vercel for continuous deployment.
 
 ### Environment Variables

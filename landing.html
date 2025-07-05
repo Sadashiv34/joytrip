@@ -630,8 +630,8 @@
                             );
                             
                             if (result.success) {
-                                // Redirect to dashboard or show success message
-                                window.location.href = '/dashboard.html';
+                                // Redirect to map page or show success message
+                                window.location.href = 'map.html';
                             } else {
                                 showError(form, result.error);
                             }
@@ -642,8 +642,8 @@
                             );
                             
                             if (result.success) {
-                                // Redirect to dashboard or show success message
-                                window.location.href = '/dashboard.html';
+                                // Redirect to map page or show success message
+                                window.location.href = 'map.html';
                             } else {
                                 showError(form, result.error);
                             }
@@ -789,13 +789,14 @@
         document.addEventListener('click', function(e) {
             if (e.target.matches('.btn')) {
                 const button = e.target;
+                const originalText = button.textContent.trim();
                 button.classList.add('btn-loading');
-                button.innerHTML = '<span class="btn-spinner"></span> ' + button.textContent.trim();
-                
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+
                 // Remove loading state after navigation or after a timeout
                 setTimeout(() => {
                     button.classList.remove('btn-loading');
-                    button.innerHTML = button.textContent.replace('', '').trim();
+                    button.innerHTML = originalText;
                 }, 2000);
             }
         });

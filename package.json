@@ -5,7 +5,9 @@
   "main": "landing.html",
   "scripts": {
     "start": "npx serve -s",
-    "build": "bash build.sh"
+    "build": "bash build.sh",
+    "dev": "npx serve -s -p 3000",
+    "deploy": "npm run build && gh-pages -d public"
   },
   "now-build": "bash build.sh",
   "keywords": [
@@ -23,6 +25,7 @@
     "node": ">=14.x"
   },
   "devDependencies": {
-    "@vercel/static-build": "^1.0.0"
+    "@vercel/static-build": "^1.0.0",
+    "gh-pages": "^6.0.0"
   }
 }
